@@ -16,8 +16,24 @@ $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 $csproj = Join-Path $root 'src\SharedUpgrades.csproj'
 
+# Resolve dotnet: prefer PATH, fall back to standard install locations.
+$dotnet = $null
+$cmd = Get-Command dotnet -ErrorAction SilentlyContinue
+if ($cmd) { $dotnet = $cmd.Source }
+if (-not $dotnet) {
+    foreach ($candidate in @(
+        "$env:ProgramFiles\dotnet\dotnet.exe",
+        "${env:ProgramFiles(x86)}\dotnet\dotnet.exe",
+        "$env:LOCALAPPDATA\Microsoft\dotnet\dotnet.exe",
+        "$env:USERPROFILE\.dotnet\dotnet.exe"
+    )) {
+        if (Test-Path $candidate) { $dotnet = $candidate; break }
+    }
+}
+if (-not $dotnet) { throw "Could not find dotnet. Install the .NET 8 SDK from https://dotnet.microsoft.com/download" }
+
 Write-Host "Building $Configuration..." -ForegroundColor Cyan
-& dotnet build $csproj -c $Configuration
+& $dotnet build $csproj -c $Configuration
 if ($LASTEXITCODE -ne 0) { throw "Build failed (exit $LASTEXITCODE)" }
 
 # Read version straight out of the csproj so it stays in lockstep with the assembly.
