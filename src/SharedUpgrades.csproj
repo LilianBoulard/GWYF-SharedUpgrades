@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>SharedUpgrades</AssemblyName>
+    <RootNamespace>SharedUpgrades</RootNamespace>
+    <Version>1.0.0</Version>
+    <Description>Shares upgrade items between all players in Gamble With Your Friends.</Description>
+
+    <!--
+      Path to your Gamble With Your Friends install. Override on the command line with
+        dotnet build -p:GameDir="D:\Steam\steamapps\common\Gamble With Your Friends"
+      or edit the default below.
+    -->
+    <GameDir Condition="'$(GameDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Gamble With Your Friends</GameDir>
+    <ManagedDir>$(GameDir)\Gamble With Your Friends_Data\Managed</ManagedDir>
+    <BepInExDir>$(GameDir)\BepInEx</BepInExDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExDir)\core\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExDir)\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mirror">
+      <HintPath>$(ManagedDir)\Mirror.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="VerifyGameDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(ManagedDir)\Assembly-CSharp.dll')"
+           Text="Could not find Assembly-CSharp.dll under '$(ManagedDir)'. Set GameDir in SharedUpgrades.csproj or pass -p:GameDir=&quot;...&quot; on the command line." />
+    <Error Condition="!Exists('$(BepInExDir)\core\BepInEx.dll')"
+           Text="Could not find BepInEx under '$(BepInExDir)'. Install BepInEx 5 first (see README), then build." />
+  </Target>
+
+  <Target Name="DeployToPlugins" AfterTargets="Build" Condition="Exists('$(BepInExDir)\plugins')">
+    <PropertyGroup>
+      <PluginDeployDir>$(BepInExDir)\plugins\$(AssemblyName)</PluginDeployDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(PluginDeployDir)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(PluginDeployDir)" />
+    <Message Importance="high" Text="Deployed $(AssemblyName).dll -&gt; $(PluginDeployDir)" />
+  </Target>
+
+</Project>
