@@ -16,7 +16,7 @@ A small BepInEx 5 mod for **Gamble With Your Friends** v1.0.7 that turns upgrade
 
 ### 2. Install Shared Upgrades
 
-1. Download the latest release zip from this repo's releases page or the [Nexus mod page](https://www.nexusmods.com/gamblewithyourfriends/mods/8).
+1. Download the latest release zip from [this repo's releases page](https://github.com/LilianBoulard/GWYF-SharedUpgrades/releases) or the [Nexus mod page](https://www.nexusmods.com/gamblewithyourfriends/mods/8).
 2. Extract it into your game folder. The internal layout is `BepInEx/plugins/SharedUpgrades/SharedUpgrades.dll`, so extracting at the game root drops the DLL in the right place.
 3. Launch the game. Open `BepInEx/LogOutput.log` and look for:
    ```
